@@ -3,6 +3,10 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
+import json
+
+url1 = "https://www.upm.es/Estudiantes/Estudios_Titulaciones/EstudiosOficialesGrado"
+
 
 def collect_data(url):
     chrome_options = Options()
@@ -10,6 +14,7 @@ def collect_data(url):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     driver.get(url)
     return driver.page_source
+
 
 def parse_data(data):
     soup = BeautifulSoup(data, 'lxml')
@@ -34,16 +39,15 @@ def parse_data(data):
             grade['center'] = td.text.split('\n')[1]
             grades.append(grade)
 
-
     return grades
 
 
-url1 = "https://www.upm.es/Estudiantes/Estudios_Titulaciones/EstudiosOficialesGrado"
+if __name__ == "__upm__":
+    data = collect_data(url1)
+    grades = parse_data(data)
+    json_grades = json.dumps(grades)
+    with open("upm.json", 'w', encoding="utf-8") as file:
+        file.write(json_grades)
 
-data = collect_data(url1)
 
-grades = parse_data(data)
 
-for grade in grades:
-    print(grade['name'])
-    print(grade['href'])
